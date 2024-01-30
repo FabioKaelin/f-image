@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: f-image
+  labels:
+    app: f-image
+spec:
+  # storageClassName: managed-csi
+  storageClassName: standard
+  # storageClassName: default
+  # storageClassName: ivp-foperator-file-temp-standard
+  accessModes:
+    - ReadWriteMany
+    # - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: "32Gi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f-image
+spec:
+  selector:
+    matchLabels:
+      app: f-image
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: f-image
+    spec:
+      containers:
+      - name: f-image
+        image: ghcr.io/fabiokaelin/f-image:1.0.0
+        ports:
+        - containerPort: 8002
+        volumeMounts:
+        - mountPath: /app/public
+          mountPropagation: None
+          name: f-image
+      imagePullSecrets:
+      - name: regcred
+      volumes:
+      - name: f-image
+        persistentVolumeClaim:
+          claimName: f-image
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: f-image
+spec:
+  selector:
+    app: f-image
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8002
