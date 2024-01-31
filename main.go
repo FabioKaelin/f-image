@@ -27,7 +27,6 @@ func init() {
 
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Println("CORSMiddleware")
 		origin := c.Request.Header.Get("Origin")
 		c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")

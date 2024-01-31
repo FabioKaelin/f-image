@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"image"
 	"image/png"
-	"log"
 	"net/http"
 	"os"
 
@@ -29,16 +28,22 @@ func PostProfileImage(ctx *gin.Context) {
 
 	imageFile, _, err := image.Decode(file)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("error", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error durring decoding image"})
+		return
 	}
 	buf := new(bytes.Buffer)
 	if err := png.Encode(buf, imageFile); err != nil {
-		log.Fatal(err)
+		fmt.Println("error", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error durring encoding image"})
+		return
 	}
 
 	pngFile, err := png.Decode(buf)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("error", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error durring decoding image"})
+		return
 	}
 
 	src := imaging.Fill(pngFile, 400, 400, imaging.Center, imaging.Lanczos)
@@ -46,7 +51,9 @@ func PostProfileImage(ctx *gin.Context) {
 	// src := imaging.Resize(pngFile, 1000, 0, imaging.Lanczos)
 	err = imaging.Save(src, fmt.Sprintf("public/images/%v", newFileName))
 	if err != nil {
-		log.Fatalf("failed to save image: %v", err)
+		fmt.Println("error", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error durring saving image"})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"worked": true})
