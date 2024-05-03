@@ -8,6 +8,7 @@ RUN --mount=target=. \
     GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o /out/app .
 
 FROM alpine
-COPY --from=build /out/app /bin/app
+# COPY --from=build /out/app /bin/app
+COPY --from=build /out/app /app/app
 
-CMD ["/bin/app"]
+CMD ["/app/app"]

@@ -14,11 +14,13 @@ import (
 )
 
 func PostProfileImage(ctx *gin.Context) {
+	fmt.Println("----------------------------- PostProfileImage ----------------------------- Start")
 	userID := ctx.Param("userid")
 	fmt.Println("userID", userID)
 
 	file, _, err := ctx.Request.FormFile("image")
 	if err != nil {
+		fmt.Println("file err", err)
 		ctx.String(http.StatusBadRequest, fmt.Sprintf("file err : %s", err.Error()))
 		return
 	}
@@ -57,6 +59,7 @@ func PostProfileImage(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"worked": true})
+	fmt.Println("----------------------------- PostProfileImage ----------------------------- End")
 }
 
 func GetProfileImage(ctx *gin.Context) {
