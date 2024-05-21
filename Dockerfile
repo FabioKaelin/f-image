@@ -11,7 +11,6 @@ FROM alpine
 COPY --from=build /out/app /app/app
 
 RUN mkdir -p /public
-RUN mkdir -p /public/images
 
 COPY ./public /public
 

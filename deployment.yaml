@@ -33,11 +33,11 @@ spec:
     spec:
       containers:
       - name: f-image
-        image: ghcr.io/fabiokaelin/f-image:1.0.4
+        image: ghcr.io/fabiokaelin/f-image:1.0.5
         ports:
         - containerPort: 8002
         volumeMounts:
-        - mountPath: /public
+        - mountPath: /public/images
           mountPropagation: None
           name: f-image
       imagePullSecrets:
