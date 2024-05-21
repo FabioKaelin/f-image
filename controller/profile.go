@@ -81,6 +81,7 @@ func GetProfileImage(ctx *gin.Context) {
 		ctx.Status(http.StatusOK)
 		ctx.File("public/default.png")
 	} else {
+		fmt.Println(err)
 		fmt.Println("error durring checking if file exists")
 		// ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error durring checking if file exists"})
 		// Schrodinger: file may or may not exist. See err for details.
