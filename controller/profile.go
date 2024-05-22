@@ -48,7 +48,8 @@ func PostProfileImage(ctx *gin.Context) {
 		return
 	}
 
-	src := imaging.Fill(pngFile, 400, 400, imaging.Center, imaging.Lanczos)
+	src := imaging.Fill(pngFile, 250, 250, imaging.Center, imaging.Lanczos)
+	// src := imaging.Fill(pngFile, 400, 400, imaging.Center, imaging.Lanczos)
 	// src := imaging.Fill(pngFile, 100, 100, imaging.Center, imaging.Lanczos)
 	// src := imaging.Resize(pngFile, 1000, 0, imaging.Lanczos)
 	err = imaging.Save(src, fmt.Sprintf("public/images/%v", newFileName))
