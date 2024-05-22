@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
       - name: f-image
-        image: ghcr.io/fabiokaelin/f-image:1.0.5
+        image: ghcr.io/fabiokaelin/f-image:1.0.6
         ports:
         - containerPort: 8002
         volumeMounts:
