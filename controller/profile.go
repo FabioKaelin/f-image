@@ -34,6 +34,10 @@ func PostProfileImage(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "error durring decoding image"})
 		return
 	}
+
+	fmt.Println("X-Size:", imageFile.Bounds().Max.X)
+	fmt.Println("Y-Size:", imageFile.Bounds().Max.Y)
+
 	buf := new(bytes.Buffer)
 	if err := png.Encode(buf, imageFile); err != nil {
 		fmt.Println("error", err)
@@ -48,7 +52,7 @@ func PostProfileImage(ctx *gin.Context) {
 		return
 	}
 
-	src := imaging.Fill(pngFile, 250, 250, imaging.Center, imaging.Lanczos)
+	src := imaging.Fill(pngFile, 200, 200, imaging.Center, imaging.Lanczos)
 	// src := imaging.Fill(pngFile, 400, 400, imaging.Center, imaging.Lanczos)
 	// src := imaging.Fill(pngFile, 100, 100, imaging.Center, imaging.Lanczos)
 	// src := imaging.Resize(pngFile, 1000, 0, imaging.Lanczos)
