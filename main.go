@@ -36,6 +36,7 @@ func main() {
 	apiGroup := router.Group("/api")
 	apiGroup.POST("/users/:userid", controller.PostProfileImage)
 	apiGroup.GET("/users/:userid", controller.GetProfileImage)
+	apiGroup.GET("/ping", controller.Ping)
 
 	fmt.Println("Server is running on port 8002")
 	panic(router.Run(":" + "8002"))
