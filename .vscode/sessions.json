@@ -10,7 +10,7 @@
                 "name": "Git",
                 "commands": [
                     " cd $CODE",
-                    "cd f-oauth",
+                    "cd f-image",
                     "git status"
                 ],
                 "joinOperator": ";",
@@ -23,8 +23,7 @@
                     "name": "Backend",
                     "commands": [
                         " cd $CODE",
-                        "cd f-oauth",
-                        "cd backend",
+                        "cd f-image",
                         "go run ."
                     ],
                     "joinOperator": ";",
