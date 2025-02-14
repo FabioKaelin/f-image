@@ -27,13 +27,15 @@ func main() {
 	router.HandleMethodNotAllowed = true
 	router.Use(cors.CORSMiddleware())
 
-	baseHandler.InitBaseHandler(router, baseHandler.IgnoreChecks{}, "Welcome to the API for images")
+	baseHandler.InitBaseHandler(router, baseHandler.IgnoreChecks{OAuthServer: true, ImageServer: true, Database: true}, "Welcome to the API for images")
 
 	apiGroup := router.Group("/api")
 
 	apiGroup.POST("/users/:userid", controllers.PostProfileImage)
 	apiGroup.GET("/users/:userid", controllers.GetProfileImage)
 
-	logger.Log.Info("Server Version " + config.FVersion + " is running on port 8002")
+	controllers.ProfileRouter(apiGroup)
+
+	logger.Log.Info("Image Backend Server Version " + config.FVersion + " is running on port 8002")
 	router.Run("0.0.0.0:8002")
 }

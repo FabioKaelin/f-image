@@ -6,10 +6,7 @@ metadata:
   labels:
     app: f-image
 spec:
-  # storageClassName: managed-csi
   storageClassName: standard
-  # storageClassName: default
-  # storageClassName: ivp-foperator-file-temp-standard
   accessModes:
     - ReadWriteMany
     # - ReadWriteOnce
@@ -39,9 +36,19 @@ spec:
         ports:
         - containerPort: 8002
         volumeMounts:
-        - mountPath: /public/images
+        - mountPath: /public/dynamic
+        # - mountPath: /public/images
           mountPropagation: None
           name: f-image
+        env:
+        - name: GIN_MODE
+          value: "release"
+        - name: NOTIFICATION_ID
+          value: "RHxMmpGcX"
+        - name: JSON_LOGS
+          value: "false"
+        - name: F_VERSION
+          value: "1.0.8"
       imagePullSecrets:
       - name: regcred
       volumes:
