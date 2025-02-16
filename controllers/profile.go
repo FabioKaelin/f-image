@@ -12,6 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	// defaultProfileImagePath is the path to the default profile image
+	defaultProfileImagePath = "public/static/profiles/default.png"
+	// dynamicProfileImagePath is the path to the dynamic profile image
+	dynamicProfileImagePath = "public/dynamic/profiles/"
+)
+
 // ProfileRouter defines the routes for the profile
 func ProfileRouter(apiGroup *gin.RouterGroup) {
 	profileGroup := apiGroup.Group("/profile")
@@ -24,24 +31,24 @@ func ProfileRouter(apiGroup *gin.RouterGroup) {
 func profileGet(c *gin.Context) {
 	userID := c.Param("userid")
 	logger.Log.Debug("userID: " + userID)
+	c.Writer.Header().Set("Content-Type", "image/png")
+	c.Status(http.StatusOK)
+	if userID == "default" {
+		c.File(defaultProfileImagePath)
+		return
+	}
 
-	if _, err := os.Stat("public/dynamic/profiles/" + userID + ".png"); err == nil {
-		c.Writer.Header().Set("Content-Type", "image/png")
-		c.Status(http.StatusOK)
-		c.File("public/dynamic/profiles/" + userID + ".png")
+	if _, err := os.Stat(dynamicProfileImagePath + userID + ".png"); err == nil {
+		c.File(dynamicProfileImagePath + userID + ".png")
 	} else if errors.Is(err, os.ErrNotExist) {
 		logger.Log.Debug("file does not exist, returning default image")
 
-		c.Writer.Header().Set("Content-Type", "image/png")
-		c.Status(http.StatusOK)
-		c.File("public/static/profiles/default.png")
+		c.File(defaultProfileImagePath)
 	} else {
 		logger.Log.Error(err.Error())
 		logger.Log.Error("error durring checking if file exists, returning default image")
 
-		c.Writer.Header().Set("Content-Type", "image/png")
-		c.Status(http.StatusOK)
-		c.File("public/static/profiles/default.png")
+		c.File(defaultProfileImagePath)
 	}
 }
 
@@ -73,7 +80,7 @@ func profilePost(c *gin.Context) {
 		return
 	}
 
-	ferr = save.ResizeSave(pngImg, "public/dynamic/profiles/"+userID+".png", 200, 200)
+	ferr = save.ResizeSave(pngImg, dynamicProfileImagePath+userID+".png", 200, 200)
 	if ferr != nil {
 		logger.Log.Error("resize save err: " + ferr.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "resize save err: " + ferr.UserMsg()})

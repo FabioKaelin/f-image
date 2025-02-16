@@ -5,7 +5,7 @@ go 1.23.2
 toolchain go1.23.6
 
 require (
-	github.com/fabiokaelin/fcommon v1.2.0
+	github.com/fabiokaelin/fcommon v1.2.2
 	github.com/gin-gonic/gin v1.10.0
 )
 
@@ -32,7 +32,7 @@ require (
 	github.com/gin-contrib/sse v1.0.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.24.0 // indirect
+	github.com/go-playground/validator/v10 v10.25.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/joho/godotenv v1.5.1
 	github.com/json-iterator/go v1.1.12 // indirect

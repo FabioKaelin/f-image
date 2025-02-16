@@ -49,10 +49,18 @@ spec:
           value: "false"
         - name: F_VERSION
           value: "1.0.8"
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 25m
+            memory: 32Mi
+          volumes:
+          - name: f-image
       imagePullSecrets:
       - name: regcred
-      volumes:
-      - name: f-image
+      automountServiceAccountToken: false
         persistentVolumeClaim:
           claimName: f-image
 ---
