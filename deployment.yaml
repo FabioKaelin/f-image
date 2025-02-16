@@ -51,16 +51,16 @@ spec:
           value: "1.0.8"
         resources:
           limits:
-            cpu: 200m
-            memory: 512Mi
+            cpu: 100m
+            memory: 256Mi
           requests:
-            cpu: 25m
-            memory: 32Mi
-          volumes:
-          - name: f-image
+            cpu: 20m
+            memory: 16Mi
+      automountServiceAccountToken: false
       imagePullSecrets:
       - name: regcred
-      automountServiceAccountToken: false
+      volumes:
+      - name: f-image
         persistentVolumeClaim:
           claimName: f-image
 ---
