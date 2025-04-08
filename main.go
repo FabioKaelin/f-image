@@ -31,9 +31,6 @@ func main() {
 
 	apiGroup := router.Group("/api")
 
-	apiGroup.POST("/users/:userid", controllers.PostProfileImage)
-	apiGroup.GET("/users/:userid", controllers.GetProfileImage)
-
 	controllers.ProfileRouter(apiGroup)
 
 	logger.Log.Info("Image Backend Server Version " + config.FVersion + " is running on port 8002")

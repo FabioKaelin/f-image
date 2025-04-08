@@ -49,6 +49,34 @@ spec:
           value: "false"
         - name: F_VERSION
           value: "1.0.8"
+        resources:
+          limits:
+            cpu: 100m
+            memory: 256Mi
+          requests:
+            cpu: 20m
+            memory: 16Mi
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /api/ping
+            port: 8002
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /api/ping
+            port: 8002
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 1
+      automountServiceAccountToken: false
       imagePullSecrets:
       - name: regcred
       volumes:
