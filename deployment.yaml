@@ -15,6 +15,13 @@ spec:
     requests:
       storage: "8Gi"
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: f-image-sa
+  namespace: f-image
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -30,6 +37,7 @@ spec:
       labels:
         app: f-image
     spec:
+      serviceAccountName: f-image-sa # <-- Use custom ServiceAccount
       containers:
       - name: f-image
         image: ghcr.io/fabiokaelin/f-image:1.0.9
@@ -37,7 +45,6 @@ spec:
         - containerPort: 8002
         volumeMounts:
         - mountPath: /public/dynamic
-        # - mountPath: /public/images
           mountPropagation: None
           name: f-image
         env:
@@ -76,6 +83,13 @@ spec:
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 1
+        # securityContext: # <-- Add security context
+        #   runAsNonRoot: true
+        #   runAsUser: 1000
+        #   allowPrivilegeEscalation: false
+        #   readOnlyRootFilesystem: true
+        #   capabilities:
+        #     drop: ["ALL"]
       automountServiceAccountToken: false
       imagePullSecrets:
       - name: regcred
@@ -83,6 +97,67 @@ spec:
       - name: f-image
         persistentVolumeClaim:
           claimName: f-image
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: f-image-deny-all
+  namespace: f-image
+spec:
+  podSelector:
+    matchLabels:
+      app: f-image
+  policyTypes:
+    - Ingress
+    - Egress
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: f-image-allow-ingress
+  namespace: f-image
+spec:
+  podSelector:
+    matchLabels:
+      app: f-image
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              fimageconnection: true
+      ports:
+        - protocol: TCP
+          port: 8002
+    - from:
+        - podSelector: {} # Allow from same namespace (adjust as needed)
+      ports:
+        - protocol: TCP
+          port: 8002
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: f-image-allow-egress
+  namespace: f-image
+spec:
+  podSelector:
+    matchLabels:
+      app: f-image
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector: {} # Allow to same namespace (adjust as needed)
+      ports:
+        - protocol: TCP
+          port: 53 # Example: DNS
+        - protocol: UDP
+          port: 53
 ---
 apiVersion: v1
 kind: Service
