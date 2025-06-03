@@ -128,7 +128,7 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              fimageconnection: true
+              fimageconnection: "true"
       ports:
         - protocol: TCP
           port: 8002
