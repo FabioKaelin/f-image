@@ -111,32 +111,64 @@ spec:
       port: 80
       targetPort: 8002
 ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: f-image-network-policy
+#   namespace: f-image
+# spec:
+#   podSelector: {} # Applies to all pods in this namespace
+#   policyTypes:
+#     - Ingress
+#     - Egress
+#   ingress:
+#     - from:
+#         - podSelector: {} # From same namespace
+#       ports:
+#         - protocol: TCP
+#           port: 8002
+#     - from:
+#         - namespaceSelector:
+#             matchLabels:
+#               fabkli.ch/f-image-connection: "true"
+#       ports:
+#         - protocol: TCP
+#           port: 8002
+#   egress:
+#     - to:
+#         - podSelector: {} # Allow internal DNS and other internal services (adjust if needed)
+#       ports:
+#         - protocol: TCP
+#           port: 53
+#         - protocol: UDP
+#           port: 53
+
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: f-image-network-policy
   namespace: f-image
 spec:
-  podSelector: {} # Applies to all pods in this namespace
+  podSelector: {}  # Gilt für alle Pods im Namespace
   policyTypes:
     - Ingress
     - Egress
   ingress:
     - from:
-        - podSelector: {} # From same namespace
+        - podSelector: {}  # Erlaubt Verkehr aus demselben Namespace
       ports:
         - protocol: TCP
           port: 8002
     - from:
         - namespaceSelector:
             matchLabels:
-              fabkli.ch/f-image-connection: "true"
+              fabkli.ch/f-image-connection: "true"  # Verkehr von ausgewählten Namespaces
       ports:
         - protocol: TCP
           port: 8002
   egress:
     - to:
-        - podSelector: {} # Allow internal DNS and other internal services (adjust if needed)
+        - namespaceSelector: {}  # Erlaubt grundsätzlich alle Namespaces
       ports:
         - protocol: TCP
           port: 53
