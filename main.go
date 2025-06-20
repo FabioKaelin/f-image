@@ -32,6 +32,7 @@ func main() {
 	apiGroup := router.Group("/api")
 
 	controllers.ProfileRouter(apiGroup)
+	controllers.GalleryRouter(apiGroup)
 
 	logger.Log.Info("Image Backend Server Version " + config.FVersion + " is running on port 8002")
 	router.Run("0.0.0.0:8002")

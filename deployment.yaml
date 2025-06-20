@@ -40,7 +40,7 @@ spec:
       serviceAccountName: f-image-sa # <-- Use custom ServiceAccount
       containers:
       - name: f-image
-        image: ghcr.io/fabiokaelin/f-image:1.0.9
+        image: ghcr.io/fabiokaelin/f-image:1.1.0
         ports:
         - containerPort: 8002
         volumeMounts:
