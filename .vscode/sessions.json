@@ -1,37 +1,37 @@
 {
-    "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v10/terminal-keeper.json",
-    "theme": "tribe",
-    "active": "default",
-    "activateOnStartup": true,
-    "keepExistingTerminals": false,
-    "sessions": {
-        "default": [
-            {
-                "name": "Git",
-                "commands": [
-                    " cd $CODE",
-                    "cd f-image",
-                    "git status"
-                ],
-                "joinOperator": ";",
-                "icon": "git-branch",
-                "color": "terminal.ansiRed",
-                "autoExecuteCommands": true
-            },
-            [
-                {
-                    "name": "Backend",
-                    "commands": [
-                        " cd $CODE",
-                        "cd f-image",
-                        "go run ."
-                    ],
-                    "joinOperator": ";",
-                    "autoExecuteCommands": true,
-                    "icon": "circuit-board",
-                    "color": "terminal.ansiBrightBlue"
-                }
-            ]
-        ]
-    }
+  "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v11/terminal-keeper.json",
+  "theme": "tribe",
+  "active": "default",
+  "activateOnStartup": true,
+  "keepExistingTerminals": false,
+  "sessions": {
+    "default": [
+      {
+        "name": "Git",
+        "commands": [
+          " cd $CODE",
+          "cd f-image",
+          "git status"
+        ],
+        "joinOperator": ";",
+        "icon": "git-branch",
+        "color": "terminal.ansiRed",
+        "autoExecuteCommands": true
+      },
+      [
+        {
+          "name": "Backend",
+          "commands": [
+            " cd $CODE",
+            "cd f-image",
+            "go run ."
+          ],
+          "joinOperator": ";",
+          "autoExecuteCommands": true,
+          "icon": "circuit-board",
+          "color": "terminal.ansiBrightBlue"
+        }
+      ]
+    ]
+  }
 }
