@@ -37,6 +37,8 @@ spec:
       labels:
         app: f-image
     spec:
+      priorityClassName: fabkli-f-image
+      terminationGracePeriodSeconds: 120
       serviceAccountName: f-image-sa # <-- Use custom ServiceAccount
       containers:
       - name: f-image
