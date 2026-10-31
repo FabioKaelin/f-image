@@ -1,0 +1,12 @@
+[
+  {
+    "id": "image",
+    "context": ".",
+    "dockerfile": "Dockerfile",
+    "image": "f-image",
+    "namespace": "f-image",
+    "resource": "deployment",
+    "deployment": "f-image",
+    "container": "f-image"
+  }
+]

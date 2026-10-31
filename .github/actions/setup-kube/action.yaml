@@ -1,0 +1,7 @@
+name: Short-lived Kubernetes access
+description: Verify this approved GitHub job through OIDC; obtain application-scoped access
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: python3 "$GITHUB_WORKSPACE/.github/scripts/k3s-login.py"
