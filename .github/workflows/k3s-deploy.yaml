@@ -1,0 +1,109 @@
+name: Test, build and deploy to k3s
+'on':
+  push:
+    branches:
+    - main
+  workflow_dispatch: {}
+permissions:
+  contents: read
+concurrency:
+  group: k3s-production
+  cancel-in-progress: false
+jobs:
+  check:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      with:
+        persist-credentials: false
+    - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff
+      with:
+        go-version: 1.27.3
+        cache: false
+    - run: go test ./... && go build ./...
+      working-directory: .
+  build:
+    needs: check
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - id: image
+          context: .
+          dockerfile: Dockerfile
+          image: f-image
+    steps:
+    - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      with:
+        persist-credentials: false
+    - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+    - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.CR_PAT || github.token }}
+    - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
+      id: image
+      with:
+        context: ${{ matrix.context }}
+        file: ${{ matrix.dockerfile }}
+        platforms: linux/arm64
+        push: true
+        tags: ghcr.io/fabiokaelin/${{ matrix.image }}:sha-${{ github.sha }}
+        build-args: VERSION=${{ github.sha }}
+        labels: 'org.opencontainers.image.revision=${{ github.sha }}
+
+          org.opencontainers.image.source=https://github.com/${{ github.repository }}'
+        cache-from: type=gha,scope=${{ matrix.id }}
+        cache-to: type=gha,mode=max,scope=${{ matrix.id }}
+    - name: Record immutable build
+      env:
+        DIGEST: ${{ steps.image.outputs.digest }}
+        COMPONENT: ${{ matrix.id }}
+      run: 'mkdir -p release
+
+        python3 -c ''import json,os,pathlib; pathlib.Path("release/"+os.environ["COMPONENT"]+".json").write_text(json.dumps({"digest":os.environ["DIGEST"]}))'''
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: release-${{ matrix.id }}
+        path: release/*.json
+        retention-days: 7
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+    - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      with:
+        persist-credentials: false
+    - name: Reject superseded commit
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: test "$(gh api repos/$GITHUB_REPOSITORY/git/ref/heads/main --jq .object.sha)" = "$GITHUB_SHA"
+    - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+      with:
+        pattern: release-*
+        path: release
+        merge-multiple: true
+    - uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede
+      with:
+        version: v1.35.9
+    - name: Obtain short-lived deployment identity
+      run: python3 .github/scripts/k3s-login.py
+    - name: Deploy and verify; restore images on failure
+      run: python3 .github/scripts/k3s-deploy.py
+    - name: Remove credentials
+      if: always()
+      run: rm -f "$RUNNER_TEMP/k3s-ci.json"

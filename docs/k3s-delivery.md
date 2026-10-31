@@ -1,0 +1,11 @@
+# Native k3s delivery
+
+Every push or merge to `main` runs `k3s-deploy.yaml`: source tests, native ARM64 image builds, then production deployment. Manual dispatch also requires `main`. All builds must pass before deployment starts. Concurrent deployments are serialized; superseded commits are rejected.
+
+Images are published with the source SHA and deployed with their exact digest. The deployer patches only existing application image references, preserving native volumes, placement, sidecars, Secrets and replicas. Fdeployment-managed apps are updated through their owning custom resource so reconciliation retains the image. Failed readiness restores previous image references and marks the job failed; it does not undo application database migrations. Infrastructure/schema/storage changes require their own reviewed migration.
+
+The production job requests a GitHub OIDC identity, which the k3s host verifies against GitHub signature keys, audience, repository ID/owner ID, workflow path, main branch, event and environment. It exchanges that identity once for a 15-minute Kubernetes token. Each repository has a separate service account, limited to its named application resources. It cannot read Secrets, change volumes, RBAC, nodes or unrelated applications. TLS is verified at both proxy hops. No cluster password or administrator kubeconfig is stored in GitHub Actions.
+
+`production` permits deployments from `main` only. Deployment credentials are masked and removed in the final step. The historical deployment workflows are retired to avoid competing deployers. Tipp deploys its production backend, frontend and consumer; the existing dev instance remains separate. Media deploys the currently active `media/dev-*` instances; retired media production and gallery instances are not recreated.
+
+The host broker is `github-k3s-broker.service`; its trust policy is `/etc/fabkli/ci-policy.json`. Host implementation, RBAC, tests and recovery instructions are maintained in `/home/admin/code/k3s-ci-security/platform`. Revoke one repository by removing its trust entry and restarting the broker, or deleting its `ci-deploy/github-<repository>` service account. No owner password rotation is required to revoke Actions access.
